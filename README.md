@@ -12,5 +12,5 @@ and you can also delete the user when you feel like It.
 I added an Application system, which will not only have hooks for when executed and loading, but also has a built in saving and loading system for infos they may need.
 The Math Challenge application makes use of it for the Hi-Score loading and saving.
 
-All the infos in the application are saved locally, of course, and please, DO NOT set your actual password for your user in It. I still need to figure out how to encode strings, 
-since BinaryWriter and BinaryReader doesn't actually encode string values.
+All the infos in the application are saved locally, inside the application folder, of course, and please, DO NOT set your actual password for your user in It.
+I still need to figure out how to encode strings, since BinaryWriter and BinaryReader doesn't actually encode string values.
