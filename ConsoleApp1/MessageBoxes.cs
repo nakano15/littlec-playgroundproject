@@ -8,9 +8,50 @@ namespace ConsoleApp1
 {
     public class MessageBoxes
     {
-        public static int DialogueWithNumberInput(string Message, bool Password = false)
+        public static float ConsoleDialogueWithDecimalInput(string Message, bool Password = false, bool NegativesAllowed = false)
         {
-            return int.Parse(DialogueWithInput(Message, Password, Rules.NumbersOnly));
+            if (!ConsoleCharacter.CreatedConsoleCharacter)
+                return DialogueWithDecimalInput(Message, Password, NegativesAllowed);
+            return SomeonesDialogueWithDecimalInput(Message, ConsoleCharacter.ConsoleName, Password, NegativesAllowed);
+        }
+
+        public static float SomeonesDialogueWithDecimalInput(string Message, string Speaker, bool Password = false, bool NegativesAllowed = false)
+        {
+            return DialogueWithDecimalInput("[" + Speaker + "]\n" + Message, Password, NegativesAllowed);
+        }
+
+        public static float DialogueWithDecimalInput(string Message, bool Password = false, bool NegativesAllowed = false)
+        {
+            return float.Parse(DialogueWithInput(Message, Password, (NegativesAllowed ? Rules.NumbersOnlyWithDecimalAndNegative : Rules.NumbersOnlyWithDecimal)));
+        }
+
+        public static int ConsoleDialogueWithNumberInput(string Message, bool Password = false, bool NegativesAllowed = false)
+        {
+            if (!ConsoleCharacter.CreatedConsoleCharacter)
+                return DialogueWithNumberInput(Message, Password, NegativesAllowed);
+            return SomeonesDialogueWithNumberInput(Message, ConsoleCharacter.ConsoleName, Password, NegativesAllowed);
+        }
+
+        public static int SomeonesDialogueWithNumberInput(string Message, string SpeakerName, bool Password = false, bool NegativesAllowed = false)
+        {
+            return DialogueWithNumberInput("[" + SpeakerName + "]\n" + Message, Password, NegativesAllowed);
+        }
+
+        public static int DialogueWithNumberInput(string Message, bool Password = false, bool NegativesAllowed = false)
+        {
+            return int.Parse(DialogueWithInput(Message, Password, (NegativesAllowed ? Rules.NumbersOnlyWithNegative : Rules.NumbersOnly)));
+        }
+
+        public static string ConsoleDialogueWithInput(string Message, bool Password = false, Rules rule = Rules.Free)
+        {
+            if (!ConsoleCharacter.CreatedConsoleCharacter)
+                return DialogueWithInput(Message, Password, rule);
+            return SomeonesDialogueWithInput(Message, ConsoleCharacter.ConsoleName, Password, rule);
+        }
+
+        public static string SomeonesDialogueWithInput(string Message, string SpeakerName, bool Password = false, Rules rule = Rules.Free)
+        {
+            return DialogueWithInput("[" + SpeakerName + "]\n" + Message, Password, rule);
         }
 
         public static string DialogueWithInput(string Message, bool Password = false, Rules rule = Rules.Free)
@@ -82,6 +123,15 @@ namespace ConsoleApp1
                                 case Rules.NumbersOnly:
                                     Input = char.IsDigit(keyInfo.KeyChar);
                                     break;
+                                case Rules.NumbersOnlyWithNegative:
+                                    Input = char.IsDigit(keyInfo.KeyChar) || keyInfo.KeyChar == '-';
+                                    break;
+                                case Rules.NumbersOnlyWithDecimal:
+                                    Input = char.IsDigit(keyInfo.KeyChar) || keyInfo.KeyChar == ',';
+                                    break;
+                                case Rules.NumbersOnlyWithDecimalAndNegative:
+                                    Input = char.IsDigit(keyInfo.KeyChar) || keyInfo.KeyChar == '-' || keyInfo.KeyChar == ',';
+                                    break;
                             }
                             if (Input)
                             {
@@ -95,12 +145,36 @@ namespace ConsoleApp1
             return FinalMessage;
         }
 
+        public static bool ConsoleDialogueYesNo(string Message)
+        {
+            if (!ConsoleCharacter.CreatedConsoleCharacter)
+                return DialogueYesNo(Message);
+            return SomeonesDialogueYesNo(Message, ConsoleCharacter.ConsoleName);
+        }
+
+        public static bool SomeonesDialogueYesNo(string Message, string SpeakerName)
+        {
+            return DialogueYesNo("[" + SpeakerName + "]\n" + Message);
+        }
+
         /// <summary>
         /// Returns true if Yes is selected.
         /// </summary>
         public static bool DialogueYesNo(string Message)
         {
             return DialogueWithOptions(Message, new string[] { "Yes", "No" }) == 0;
+        }
+
+        public static int ConsoleDialogueWithOptions(string Message, string[] Option)
+        {
+            if (!ConsoleCharacter.CreatedConsoleCharacter)
+                return DialogueWithOptions(Message, Option);
+            return SomeonesDialogueWithOptions(Message, ConsoleCharacter.ConsoleName, Option);
+        }
+
+        public static int SomeonesDialogueWithOptions(string Message, string SpeakerName, string[] Option)
+        {
+            return DialogueWithOptions("[" + SpeakerName + "]\n" + Message, Option);
         }
 
         public static int DialogueWithOptions(string Message, string[] Options)
@@ -178,6 +252,21 @@ namespace ConsoleApp1
             return SelectedOption;
         }
 
+        public static void ConsoleDialogue(string Message)
+        {
+            if (!ConsoleCharacter.CreatedConsoleCharacter)
+            {
+                SimpleDialogue(Message);
+                return;
+            }
+            SomeonesDialogue(Message, ConsoleCharacter.ConsoleName);
+        }
+
+        public static void SomeonesDialogue(string Message, string SpeakerName)
+        {
+            SimpleDialogue("[" + SpeakerName + "]\n" + Message);
+        }
+
         public static void SimpleDialogue(string Message, bool IsSingleMessageBox = true)
         {
             Console.Clear();
@@ -204,9 +293,9 @@ namespace ConsoleApp1
                         FinalMessage.Add(LastMessageSplit);
                         LastMessageSplit = LastWord = "";
                     }
-                    else if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')))
+                    else if (!char.IsLetterOrDigit(c))
                     {
-                        if (LastMessageSplit.Length >= Width - 5)
+                        if (LastMessageSplit.Length + LastWord.Length >= Width - 4)
                         {
                             FinalMessage.Add(LastMessageSplit);
                             LastMessageSplit = LastWord + c;
@@ -224,7 +313,7 @@ namespace ConsoleApp1
                 }
                 if (LastWord.Length > 0)
                 {
-                    if (LastMessageSplit.Length + LastWord.Length >= Width - 5)
+                    if (LastMessageSplit.Length + LastWord.Length >= Width - 4)
                     {
                         FinalMessage.Add(LastMessageSplit);
                         LastMessageSplit = "";
@@ -270,12 +359,84 @@ namespace ConsoleApp1
                     }
                 }
             }
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+
+        private static void ParseWord(ref string Word)
+        {
+            string OldWord = Word;
+            Word = "";
+            string CommandType = "", CommandValue = "";
+            bool FinishedInputtingCommand = false, BegunCommand = false;
+            for (int i = 0; i < OldWord.Length; i++)
+            {
+                char c = OldWord[i];
+                if (c == '[')
+                {
+                    BegunCommand = true;
+                }
+                else if (c == ']')
+                {
+                    DoCommand(CommandType, CommandValue);
+                    CommandType = "";
+                    CommandValue = "";
+                    FinishedInputtingCommand = false;
+                    BegunCommand = false;
+                }
+                else if (BegunCommand)
+                {
+                    if (c == ':')
+                    {
+                        FinishedInputtingCommand = true;
+                    }
+                    else
+                    {
+                        if (!FinishedInputtingCommand)
+                        {
+                            CommandType += c;
+                        }
+                        else
+                        {
+                            CommandValue += c;
+                        }
+                    }
+                }
+                else
+                {
+                    Word += c;
+                }
+            }
+        }
+
+        private static void DoCommand(string Command, string Value)
+        {
+            switch (Command)
+            {
+                case "c": //Change Foreground Color
+                    {
+                        ConsoleColor color;
+                        if (Enum.TryParse(Value, out color))
+                            Console.ForegroundColor = color;
+                    }
+                    break;
+                case "b": //Change Background Color
+                    {
+                        ConsoleColor color;
+                        if (Enum.TryParse(Value, out color))
+                            Console.BackgroundColor = color;
+                    }
+                    break;
+            }
         }
 
         public enum Rules : byte
         {
             Free,
             NumbersOnly,
+            NumbersOnlyWithDecimal,
+            NumbersOnlyWithNegative,
+            NumbersOnlyWithDecimalAndNegative,
             LettersOnly
         }
     }
