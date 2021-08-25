@@ -181,7 +181,7 @@ namespace ConsoleApp1
         {
             SimpleDialogue(Message, false);
             int Width = Console.WindowWidth; //Height doesn't matter.
-            int BoxStart = Console.CursorTop;
+            int OptionsStart = Console.CursorTop;
             for (int x = 0; x < Width; x++)
             {
                 if (x == 0)
@@ -191,31 +191,15 @@ namespace ConsoleApp1
                 else
                     Console.Write('─');
             }
-            BoxStart++;
-            for (int o = 0; o < Options.Length; o++)
-            {
-                Console.SetCursorPosition(0, BoxStart + o);
-                Console.Write('║');
-                Console.SetCursorPosition(Width - 1, BoxStart + o);
-                Console.Write('║');
-            }
-            for (int x = 0; x < Width; x++)
-            {
-                Console.SetCursorPosition(x, BoxStart + Options.Length);
-                if (x == 0)
-                    Console.Write('╚');
-                else if (x == Width - 1)
-                    Console.Write('╝');
-                else
-                    Console.Write('═');
-            }
+            OptionsStart++;
             bool OptionPicked = false;
             int SelectedOption = 0;
             while (!OptionPicked)
             {
+                int OptionsEnd = OptionsStart;
                 for (int i = 0; i < Options.Length; i++)
                 {
-                    Console.SetCursorPosition(2, BoxStart + i);
+                    Console.SetCursorPosition(2, OptionsEnd);
                     if (i == SelectedOption)
                     {
                         Console.ForegroundColor = ConsoleColor.Black;
@@ -226,9 +210,31 @@ namespace ConsoleApp1
                         Console.ForegroundColor = ConsoleColor.Gray;
                         Console.BackgroundColor = ConsoleColor.Black;
                     }
-                    Console.Write(Options[i]);
+                    WriteFormattedMessage(Options[i], 2, Width - 2, i == SelectedOption);
+                    //TryWritingMessage(Options[i]);
+                    OptionsEnd = Console.CursorTop + 1;
+                    //Console.Write(Options[i]);
                 }
-                Console.SetCursorPosition(0, BoxStart + Options.Length + 1);
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.BackgroundColor = ConsoleColor.Black;
+                for (int o = OptionsStart; o <= OptionsEnd; o++)
+                {
+                    Console.SetCursorPosition(0, o);
+                    Console.Write('║');
+                    Console.SetCursorPosition(Width - 1, o);
+                    Console.Write('║');
+                }
+                for (int x = 0; x < Width; x++)
+                {
+                    Console.SetCursorPosition(x, OptionsEnd);
+                    if (x == 0)
+                        Console.Write('╚');
+                    else if (x == Width - 1)
+                        Console.Write('╝');
+                    else
+                        Console.Write('═');
+                }
+                Console.SetCursorPosition(0, OptionsEnd + 1);
                 ConsoleKeyInfo key = Console.ReadKey(true);
                 switch (key.Key)
                 {
@@ -236,11 +242,17 @@ namespace ConsoleApp1
                     case ConsoleKey.W:
                         if (SelectedOption > 0)
                             SelectedOption--;
+                        else
+                            SelectedOption = Options.Length - 1;
                         break;
                     case ConsoleKey.DownArrow:
                     case ConsoleKey.S:
                         if (SelectedOption < Options.Length - 1)
                             SelectedOption++;
+                        else
+                        {
+                            SelectedOption = 0;
+                        }
                         break;
                     case ConsoleKey.Enter:
                         OptionPicked = true;
@@ -271,6 +283,7 @@ namespace ConsoleApp1
         {
             Console.Clear();
             int Width = Console.WindowWidth; //Height doesn't matter.
+            //Draws the top of the message.
             for (int i = 0; i < Width; i++)
             {
                 Console.SetCursorPosition(i, 0);
@@ -281,64 +294,21 @@ namespace ConsoleApp1
                 else
                     Console.Write('═');
             }
+            //Draw the message, and the borders.
             {
-                string LastMessageSplit = "";
-                List<string> FinalMessage = new List<string>();
-                string LastWord = "";
-                foreach (char c in Message)
+                Console.SetCursorPosition(2, 1);
+                WriteFormattedMessage(Message, 2, Width - 2);
+                int EndY = Console.CursorTop;
+                for(int y = 1; y <= EndY; y++)
                 {
-                    if (c == '\n')
-                    {
-                        LastMessageSplit += LastWord;
-                        FinalMessage.Add(LastMessageSplit);
-                        LastMessageSplit = LastWord = "";
-                    }
-                    else if (!char.IsLetterOrDigit(c))
-                    {
-                        if (LastMessageSplit.Length + LastWord.Length >= Width - 4)
-                        {
-                            FinalMessage.Add(LastMessageSplit);
-                            LastMessageSplit = LastWord + c;
-                        }
-                        else
-                        {
-                            LastMessageSplit += LastWord + c;
-                        }
-                        LastWord = "";
-                    }
-                    else
-                    {
-                        LastWord += c;
-                    }
-                }
-                if (LastWord.Length > 0)
-                {
-                    if (LastMessageSplit.Length + LastWord.Length >= Width - 4)
-                    {
-                        FinalMessage.Add(LastMessageSplit);
-                        LastMessageSplit = "";
-                        FinalMessage.Add(LastWord);
-                    }
-                    else
-                    {
-                        LastMessageSplit += LastWord;
-                    }
-                }
-                if (LastMessageSplit.Length > 0)
-                {
-                    FinalMessage.Add(LastMessageSplit);
-                }
-                for (int m = 0; m < FinalMessage.Count; m++)
-                {
-                    Console.SetCursorPosition(0, m + 1);
+                    Console.SetCursorPosition(0, y);
                     Console.Write('║');
-                    Console.SetCursorPosition(2, m + 1);
-                    Console.Write(FinalMessage[m]);
-                    Console.SetCursorPosition(Width - 1, m + 1);
+                    Console.SetCursorPosition(Width - 1, y);
                     Console.Write('║');
                 }
-                Console.SetCursorPosition(0, FinalMessage.Count + 1);
+                Console.SetCursorPosition(0, EndY + 1);
             }
+            //Draw the bottom border, if it is a simple message box.
             if (IsSingleMessageBox)
             {
                 for (int i = 0; i < Width; i++)
@@ -363,7 +333,77 @@ namespace ConsoleApp1
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
-        private static void ParseWord(ref string Word)
+        public static void WriteFormattedMessage(string Message, int StartX = 0, int EndX = 0, bool IsSelected = false)
+        {
+            if (EndX == 0)
+                EndX = Console.WindowWidth;
+            string LastMessage = "";
+            string Command = "";
+            bool CommandStart = false;
+            foreach (char c in Message)
+            {
+                if (c == '[' && !CommandStart)
+                {
+                    TryWritingMessage(LastMessage, EndX);
+                    LastMessage = "";
+                    CommandStart = true;
+                    Command = "[";
+                }
+                else if (c == ']' && CommandStart)
+                {
+                    Command += ']';
+                    ParseWord(IsSelected, ref Command);
+                    Command = "";
+                    CommandStart = false;
+                }
+                else if (CommandStart)
+                {
+                    Command += c;
+                }
+                else if (c == '\n')
+                {
+                    TryWritingMessage(LastMessage, EndX);
+                    LastMessage = "";
+                    Console.CursorLeft = 2;
+                    Console.CursorTop++;
+                }
+                else if (char.IsSymbol(c) || c == ' ')
+                {
+                    TryWritingMessage(LastMessage, EndX);
+                    LastMessage = "";
+                    TryWritingMessage(c.ToString(), EndX);
+                }
+                else
+                {
+                    LastMessage += c;
+                }
+            }
+            if (LastMessage.Length > 0)
+                TryWritingMessage(LastMessage, EndX);
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+
+        private static void TryWritingMessage(string Message)
+        {
+            TryWritingMessage(Message, Console.WindowWidth - 2);
+        }
+
+        private static void TryWritingMessage(string Message, int MaxWidth)
+        {
+            if (Message.Length + Console.CursorLeft <= MaxWidth)
+            {
+                Console.Write(Message);
+            }
+            else
+            {
+                Console.CursorLeft = 2;
+                Console.CursorTop++;
+                Console.Write(Message);
+            }
+        }
+
+        private static void ParseWord(bool IsSelectedText, ref string Word)
         {
             string OldWord = Word;
             Word = "";
@@ -378,7 +418,10 @@ namespace ConsoleApp1
                 }
                 else if (c == ']')
                 {
-                    DoCommand(CommandType, CommandValue);
+                    if(!DoCommand(CommandType, CommandValue, IsSelectedText))
+                    {
+                        TryWritingMessage('[' + CommandType + (CommandValue == "" ? "]" : ":" + CommandValue + ']')); //It's not a command
+                    }
                     CommandType = "";
                     CommandValue = "";
                     FinishedInputtingCommand = false;
@@ -409,10 +452,19 @@ namespace ConsoleApp1
             }
         }
 
-        private static void DoCommand(string Command, string Value)
+        private static bool DoCommand(string Command, string Value, bool IsSelectedText = false)
         {
+            if (IsSelectedText)
+            {
+                if (Command == "c")
+                    Command = "b";
+                else if (Command == "b")
+                    Command = "c";
+            }
             switch (Command)
             {
+                default:
+                    return false;
                 case "c": //Change Foreground Color
                     {
                         ConsoleColor color;
@@ -427,7 +479,22 @@ namespace ConsoleApp1
                             Console.BackgroundColor = color;
                     }
                     break;
+                case "r":
+                    {
+                        if (IsSelectedText)
+                        {
+                            Console.BackgroundColor = ConsoleColor.White;
+                            Console.ForegroundColor = ConsoleColor.Black;
+                        }
+                        else
+                        {
+                            Console.BackgroundColor = ConsoleColor.Black;
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                        }
+                    }
+                    break;
             }
+            return true;
         }
 
         public enum Rules : byte

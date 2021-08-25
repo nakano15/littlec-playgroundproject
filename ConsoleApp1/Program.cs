@@ -94,7 +94,7 @@ namespace ConsoleApp1
         private static void TestConsoleNames()
         {
             string Message = "";
-            for(int i = 0; i < 30; i++)
+            for(int i = 0; i < 50; i++)
             {
                 if (i > 0)
                     Message += "\n";

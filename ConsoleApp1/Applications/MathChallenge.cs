@@ -65,7 +65,7 @@ namespace ConsoleApp1.Applications
                     Operation = OperationIndex.Division;
                 if(Operation == OperationIndex.Multiplication || Operation == OperationIndex.Division)
                 {
-                    LeftNumber = (int)(LeftNumber * 0.2f);
+                    if(Operation != OperationIndex.Division) LeftNumber = (int)(LeftNumber * 0.2f);
                     RightNumber = (int)(RightNumber * 0.2f);
                 }
                 int Result = 0;
