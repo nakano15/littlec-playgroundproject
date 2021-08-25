@@ -28,7 +28,7 @@ namespace ConsoleApp1
         }
 
         /// <summary>
-        /// Don't forget to close steam.
+        /// Don't forget to close stream.
         /// </summary>
         public FileStream SaveOnApplication(string FileName)
         {
@@ -42,7 +42,7 @@ namespace ConsoleApp1
         }
 
         /// <summary>
-        /// Don't forget to close steam.
+        /// Don't forget to close stream.
         /// </summary>
         public FileStream LoadOnApplication(string FileName)
         {
