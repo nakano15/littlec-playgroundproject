@@ -49,6 +49,12 @@ namespace ConsoleApp1.Applications
                     RightNumber = Program.random.Next(MinimumNumber, MaximumNumber + 1);
                 int ScoreReward = (int)Math.Max(1, (LeftNumber + RightNumber) * ScoreMult * 0.5f);
                 OperationIndex Operation = 0;
+                if (DifficultyLevel >= 8 && Program.random.Next(100 + DifficultyLevel) < MinimumNumber)
+                    Operation = OperationIndex.Subtraction;
+                if (DifficultyLevel >= 18 && Program.random.Next(75 + DifficultyLevel) < MinimumNumber)
+                    Operation = OperationIndex.Multiplication;
+                if (DifficultyLevel >= 26 && Program.random.Next(60 + DifficultyLevel) < MinimumNumber)
+                    Operation = OperationIndex.Division;
                 if (DifficultyLevel >= 12 && Program.random.Next(100 + MinimumNumber) < LeftNumber)
                 {
                     LeftNumber *= -1;
@@ -57,12 +63,6 @@ namespace ConsoleApp1.Applications
                 {
                     RightNumber *= -1;
                 }
-                if (DifficultyLevel >= 8 && Program.random.Next(100 + DifficultyLevel) < MinimumNumber)
-                    Operation = OperationIndex.Subtraction;
-                if (DifficultyLevel >= 18 && Program.random.Next(75 + DifficultyLevel) < MinimumNumber)
-                    Operation = OperationIndex.Multiplication;
-                if (DifficultyLevel >= 18 && Program.random.Next(60 + DifficultyLevel) < MinimumNumber)
-                    Operation = OperationIndex.Division;
                 if(Operation == OperationIndex.Multiplication || Operation == OperationIndex.Division)
                 {
                     if(Operation != OperationIndex.Division) LeftNumber = (int)(LeftNumber * 0.2f);
@@ -119,12 +119,12 @@ namespace ConsoleApp1.Applications
                                 break;
                             case 1:
                                 int ToReduce = Program.random.Next(1, 4);
-                                if (ToReduce > MinimumNumber)
+                                if (ToReduce < MinimumNumber)
                                     ToReduce = MinimumNumber;
                                 MinimumNumber -= ToReduce;
                                 MaximumNumber -= ToReduce;
                                 DifficultyLevel -= ToReduce;
-                                ScoreMult += 0.05f;
+                                ScoreMult -= 0.05f;
                                 break;
                         }
                     }
