@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,8 +58,23 @@ namespace ConsoleApp1
 
         public static void LoadApps()
         {
+            const string AppFolder = "Application";
             Program.Apps.Clear();
             Program.Apps.Add(new Applications.MathChallenge());
+            if (!Directory.Exists(AppFolder))
+                Directory.CreateDirectory(AppFolder);
+            foreach(string Dll in Directory.GetFiles(AppFolder, "*.dll"))
+            {
+                string DllDirectory = Environment.CurrentDirectory + "/" + Dll;
+                Assembly ass = Assembly.LoadFile(DllDirectory);
+                foreach(Type type in ass.GetExportedTypes())
+                {
+                    if(type.BaseType == typeof(Application))
+                    {
+                        Program.Apps.Add((Application)Activator.CreateInstance(type));
+                    }
+                }
+            }
             foreach (Application app in Program.Apps)
                 app.OnLoad();
         }

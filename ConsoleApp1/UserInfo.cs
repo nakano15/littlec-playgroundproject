@@ -117,6 +117,30 @@ namespace ConsoleApp1
             return HasPassword;
         }
 
+        public bool HasPassword()
+        {
+            return Password.Length > 0;
+        }
+
+        public bool IsPasswordCorrect(string InputPassword)
+        {
+            return Password == InputPassword;
+        }
+
+        public bool DeleteUser(string Password)
+        {
+            if (Password == this.Password)
+            {
+                string SaveDirectory = Program.UsersSaveFolder + "/" + Name + "/";
+                if (Directory.Exists(SaveDirectory))
+                {
+                    Directory.Delete(SaveDirectory, true);
+                }
+                return true;
+            }
+            return false;
+        }
+
         public static bool DeleteUser(string User, string Password)
         {
             string SaveDirectory = Program.UsersSaveFolder + "/" + User + "/";
@@ -276,7 +300,7 @@ namespace ConsoleApp1
                             else
                             {
                                 bool UserHasPassword = UserInfo.UserHasPassword(UserList[Picked]);
-                                if (!MessageBoxes.ConsoleDialogueYesNo("You are trying to access " + UserList[Picked] + "'s infos.\n" +
+                                if (!MessageBoxes.ConsoleDialogueYesNo("You are about to try accessing " + UserList[Picked] + "'s infos.\n" +
                                     "Is that right?"))
                                 {
                                     MessageBoxes.ConsoleDialogue("Then let's return to the user list.");
@@ -285,7 +309,7 @@ namespace ConsoleApp1
                                 string Pass = "";
                                 if (UserHasPassword)
                                 {
-                                    Pass = MessageBoxes.ConsoleDialogueWithInput("This user has set a password to the file.\n" +
+                                    Pass = MessageBoxes.ConsoleDialogueWithInput("There is a password set on this profile.\n" +
                                         "Please type in the password.", true);
                                 }
                                 UserInfo user;

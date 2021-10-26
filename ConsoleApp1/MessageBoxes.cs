@@ -9,7 +9,8 @@ namespace ConsoleApp1
     public class MessageBoxes
     {
         public static char BoxUpperLeftChar = '╔', BoxHorizontalChar = '═', BoxUpperRightChar = '╗', BoxVerticalChar = '║',
-            BoxLowerLeftChar = '╚', BoxLowerRightChar = '╝', BoxSplitterLeft = '╟', BoxSplitterHorizontal = '─', BoxSplitterRight = '╢';
+            BoxLowerLeftChar = '╚', BoxLowerRightChar = '╝', BoxSplitterLeft = '╟', BoxSplitterHorizontal = '─', BoxSplitterRight = '╢', BoxSplitterVertical = '│',
+            BoxsplitterHorizontalUpperConnection = '┴', BoxsplitterHorizontalLowerConnection = '┬';
         public static char SpeakerLeftNameChar = '[', SpeakerRightNameChar = ']';
 
         /// <summary>
@@ -38,6 +39,9 @@ namespace ConsoleApp1
             BoxSplitterLeft = '╟';
             BoxSplitterHorizontal = '─';
             BoxSplitterRight = '╢';
+            BoxSplitterVertical = '│';
+            BoxsplitterHorizontalUpperConnection = '┴';
+            BoxsplitterHorizontalLowerConnection = '┬';
         }
 
         /// <summary>

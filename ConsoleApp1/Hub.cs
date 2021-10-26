@@ -24,11 +24,11 @@ namespace ConsoleApp1
 
         private static void HubActionList()
         {
-            string[] Options = new string[] { "Open Utilities", "Open Application", "Change Console Character Information", "Close Console" };
+            string[] Options = new string[] { "Open Utilities", "Open Application", "Change Console Character Information", "Manage User", "Close Console" };
             while (true)
             {
                 string HubDialogueText = CreateFancyInterface();
-                HubDialogueText += "[" + ConsoleCharacter.ConsoleName + "]\n" + MessagesToTheUser;
+                HubDialogueText += MessageBoxes.SpeakerLeftNameChar + ConsoleCharacter.ConsoleName + MessageBoxes.SpeakerRightNameChar + "\n" + MessagesToTheUser;
                 switch (MessageBoxes.DialogueWithOptions(HubDialogueText, Options))
                 {
                     case 0:
@@ -156,6 +156,55 @@ namespace ConsoleApp1
                         }
                         break;
                     case 3:
+                        {
+                            const int DeleteUserOption = 0, ReturnOption = 1;
+                            switch (MessageBoxes.ConsoleDialogueWithOptions("Managing user infos.\n" +
+                                "What do you want to manage?", new string[] { "Delete User", "Nevermind" }))
+                            {
+                                case DeleteUserOption:
+                                    {
+                                        bool UserHasPassword = Program.MyUser.HasPassword();
+                                        MessageBoxes.ConsoleDialogue("Warning! You are about to delete this user!\n" +
+                                            "Upon deleting the user, all infos related to it will be erased, " +
+                                            "and the aplication will be closed.");
+                                        if (MessageBoxes.ConsoleDialogueYesNo("Are you sure that you want to delete this user?"))
+                                        {
+                                            string Pass = "";
+                                            if ((UserHasPassword && Pass == MessageBoxes.ConsoleDialogueWithInput("Please input your password again, for safety measures.", true)) ||
+                                                (!UserHasPassword && MessageBoxes.ConsoleDialogueYesNo("Last question! Pressing yes now, will delete this user for good.\nDo you really want to delete this user?")))
+                                            {
+                                                MessageBoxes.ConsoleDialogue("I guess you really want to delete this user...");
+                                                if (Program.MyUser.DeleteUser(Pass))
+                                                {
+                                                    MessageBoxes.ConsoleDialogue("User deleted successfully.");
+                                                    MessageBoxes.ConsoleDialogue("The console will now be closed.");
+                                                    Environment.Exit(0);
+                                                }
+                                                else
+                                                {
+                                                    MessageBoxes.ConsoleDialogue("Something went wrong with the user deletion.\n" +
+                                                        "Either user folder doesn't exists, or password is incorrect.");
+                                                    MessageBoxes.ConsoleDialogue("Returning to hub.");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                MessageBoxes.ConsoleDialogue("Incorrect password. Returning to hub.");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            MessageBoxes.ConsoleDialogue("Aborting deletion.");
+                                        }
+                                    }
+                                    break;
+                                case ReturnOption:
+                                    MessageBoxes.ConsoleDialogue("No more changes will be done then.\nReturning to hub lobby.");
+                                    break;
+                            }
+                        }
+                        break;
+                    case 4:
                         if(MessageBoxes.ConsoleDialogueYesNo("Do you want to close the console?"))
                         {
                             MessageBoxes.ConsoleDialogue("Farewell, " + Program.UserName + ".\nClosing console.");
@@ -200,9 +249,16 @@ namespace ConsoleApp1
             {
                 s += ' ';
             }
-            s += "| User: " + Program.UserName + "\n";
+            s += MessageBoxes.BoxSplitterVertical + " User: " + Program.UserName + "\n";
             for (int i = 0; i < ConsoleWidth; i++)
-                s += '-';
+                if (i == ConsoleWidth / 2)
+                {
+                    s += MessageBoxes.BoxsplitterHorizontalUpperConnection;
+                }
+                else
+                {
+                    s += MessageBoxes.BoxSplitterHorizontal;
+                }
             s += '\n';
             return s;
         }
