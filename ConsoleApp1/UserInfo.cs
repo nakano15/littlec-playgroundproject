@@ -289,13 +289,13 @@ namespace ConsoleApp1
                                         "Please type in the password.", true);
                                 }
                                 UserInfo user;
-                                if (!UserInfo.Load(UserList[Picked], Pass, out user))
+                                if (!Load(UserList[Picked], Pass, out user))
                                 {
                                     MessageBoxes.ConsoleDialogue("The password is incorrect.");
                                     goto returnToPickUser;
                                 }
                                 MessageBoxes.ConsoleDialogue("User logging in completed. Welcome back " + user.Name + ".");
-                            returnToAccountManagement:
+                            /*returnToAccountManagement:
                                 switch (MessageBoxes.ConsoleDialogueWithOptions("Do you want to manage your account?", new string[] { "No, just let me in.", "Delete my user." }))
                                 {
                                     case 0:
@@ -334,7 +334,7 @@ namespace ConsoleApp1
                                             MessageBoxes.ConsoleDialogue("Aborting deletion.");
                                             goto returnToAccountManagement;
                                         }
-                                }
+                                }*/
                                 Program.MyUser = user;
                                 return;
                             }

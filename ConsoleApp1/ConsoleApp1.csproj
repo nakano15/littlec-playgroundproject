@@ -44,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
+    <Compile Include="Applications\Agenda.cs" />
+    <Compile Include="Applications\AgendaAppClasses\Event.cs" />
     <Compile Include="Applications\MathChallenge.cs" />
     <Compile Include="ConsoleCharacter.cs" />
     <Compile Include="Hub.cs" />
