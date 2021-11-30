@@ -10,10 +10,23 @@ namespace ConsoleApp1.Applications.AgendaAppClasses
     {
         public string EventName = "";
         public string Description = "";
-        public EventTimeStruct? StartTime = null,
-            EndTime = null;
-        public EventDayStruct? StartDay = null, EndDay = null;
+        public DateTime? StartDay = null, EndDay = null;
         public bool[] DaysOfWeekEventHappens = new bool[7] { true, true, true, true, true, true, true };
+
+        public bool IsEventHappening(DateTime Now)
+        {
+            if (DaysOfWeekEventHappens[(int)Now.DayOfWeek])
+            {
+                if (!StartDay.HasValue)
+                    return true;
+                if(Now >= StartDay.Value)
+                {
+                    if (!EndDay.HasValue) return true;
+                    if (Now < EndDay.Value) return true;
+                }
+            }
+            return false;
+        }
 
         public struct EventTimeStruct
         {

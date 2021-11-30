@@ -13,7 +13,6 @@ namespace ConsoleApp1
         public static UserInfo MyUser = null;
         public const string UsersSaveFolder = "Users", ConsoleFile = "ConsoleInfos.sav";
         public static List<Application> Apps = new List<Application>();
-        private const string MagicWords = "nakanoisawesomewoahraccoonsarecool";
         public static string UserName
         {
             get

@@ -18,11 +18,17 @@ namespace ConsoleApp1
             this.Name = Name;
         }
 
+        /// <summary>
+        /// Executes the running program script.
+        /// </summary>
         public virtual void StartProgram()
         {
 
         }
 
+        /// <summary>
+        /// Executes when the program is loaded.
+        /// </summary>
         public virtual void OnLoad()
         {
 
